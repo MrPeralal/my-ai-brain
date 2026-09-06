@@ -33,5 +33,11 @@ async def ask_agent(data: UserCommand):
             timeout=30.0
         )
         res_data = response.json()
-        answer = res_data["choices"][0]["message"]["content"]
-        return {"agent_response": answer}
+        if response.status_code != 200:
+            return {"error": f"Groq API Error: {res_data}"}
+        
+        try:
+            answer = res_data["choices"][0]["message"]["content"]
+            return {"agent_response": answer}
+        except Exception as e:
+            return {"error": f"Parsing Error: {str(e)}, Response: {res_data}"}
